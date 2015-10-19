@@ -69,8 +69,8 @@ def main():
             # ValueError: No JSON object could be decoded
             sleep(3)
         except telegram.TelegramError as e:
-            if "HTTP Error 502" in e.message:
-                # telegram.error.TelegramError: HTTP Error 502: Bad Gateway
+            if "Bad Gateway" in e.message:
+                # telegram.error.TelegramError: Bad Gateway
                 sleep(5)
             else:
                 raise e
