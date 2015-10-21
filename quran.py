@@ -122,7 +122,7 @@ class Quran(object):
     def getPreviousAyah(cls, s, a):
         if a == 1:
             s = s - 1 if s > 1 else 114
-            a = 1
+            a = Quran.surah_lengths[s]
         else:
             a -= 1
         return s, a

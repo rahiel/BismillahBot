@@ -2,6 +2,17 @@
 
 BismillahBot is a bot on telegram to explore the Qur'an.
 
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
+**Table of Contents**
+
+- [Usage](#usage)
+- [Installation](#installation)
+    - [Data files](#data-files)
+    - [Updating](#updating)
+- [License](#license)
+
+<!-- markdown-toc end -->
+
 # Usage
 
 The bot can be used by messaging
