@@ -18,6 +18,7 @@
 ###############################################################################
 import re
 from time import sleep
+from urllib2 import URLError
 
 import telegram
 from redis import StrictRedis
@@ -74,6 +75,8 @@ def main():
                 sleep(5)
             else:
                 raise e
+        except URLError as e:
+            sleep(2)
 
 
 def serve(bot, update_id, data):
