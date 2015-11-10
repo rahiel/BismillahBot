@@ -66,13 +66,9 @@ def main():
     while True:
         try:
             update_id = serve(bot, update_id, data)
-        except ValueError as e:
-            # ValueError: No JSON object could be decoded
-            sleep(3)
         except telegram.TelegramError as e:
-            if "Bad Gateway" in e.message:
-                # telegram.error.TelegramError: Bad Gateway
-                sleep(5)
+            if e.message in ("Bad Gateway", "Timed out"):
+                sleep(3)
             else:
                 raise e
         except URLError as e:
