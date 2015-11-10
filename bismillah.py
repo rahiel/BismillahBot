@@ -19,6 +19,7 @@
 import re
 from time import sleep
 from urllib2 import URLError
+import sys
 
 import telegram
 from redis import StrictRedis
@@ -140,7 +141,7 @@ def serve(bot, update_id, data):
         else:
             s, a, quran_type = 1, 1, "english"
 
-        print update
+        print message
 
         if chat_id < 0:
             continue            # bot should not be in a group
@@ -179,6 +180,7 @@ def serve(bot, update_id, data):
                 s, a = Quran.getRandomAyah()
             send_quran(s, a, quran_type, chat_id)
 
+    sys.stdout.flush()
     return update_id
 
 
