@@ -4,6 +4,9 @@ from random import randint
 
 
 def parse_quran_trans():
+    """Parse translation text files (with ayah numbers) from
+    http://tanzil.net/trans/.
+    """
     quran = []
     surah = []
     s = 1
@@ -31,6 +34,9 @@ def parse_quran_trans():
 
 
 def parse_quran_tafsir():
+    """Parse tafsir al-Jalalayn from http://www.altafsir.com/Al-Jalalayn.asp, after
+    that PDF was processed with ``pdftotext -nopgbrk Al_Jalalain_Eng.pdf``.
+    """
     quran = []
     surah = []
     s, v = 1, 1
@@ -81,6 +87,7 @@ def parse_quran_tafsir():
 
 
 class Quran(object):
+    """Interface to get ayahs from the Quran."""
     surah_lengths = [0, 7, 286, 200, 176, 120, 165, 206, 75, 129, 109, 123, 111, 43, 52, 99, 128, 111, 110, 98, 135, 112, 78, 118, 64, 77, 227, 93, 88, 69, 60, 34, 30, 73, 54, 45, 83, 182, 88, 75, 85, 54, 53, 89, 59, 37, 35, 38, 29, 18, 45, 60, 49, 62, 55, 78, 96, 29, 22, 24, 13, 14, 11, 11, 18, 12, 12, 30, 52, 52, 44, 28, 28, 20, 56, 40, 31, 50, 40, 46, 42, 29, 19, 36, 25, 22, 17, 19, 26, 30, 20, 15, 21, 11, 8, 8, 19, 5, 8, 8, 11, 11, 8, 3, 9, 5, 4, 7, 3, 6, 3, 5, 4, 5, 6]
     # [0] for normal numbering
 
@@ -126,3 +133,11 @@ class Quran(object):
         else:
             a -= 1
         return s, a
+
+
+def save_json(quran):
+    """Save Quran to a json file."""
+    import json
+
+    with open("quran.json", 'w') as f:
+        json.dump(quran, f, ensure_ascii=False)
