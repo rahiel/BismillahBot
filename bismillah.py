@@ -60,7 +60,13 @@ def get_file(filename):
 
 def main():
     bot = telegram.Bot(token=TOKEN)
-    update_id = None
+
+    # get the first pending update_id, this is so we can skip over it in case
+    # we get an "Unauthorized" exception.
+    try:
+        update_id = bot.getUpdates()[0].update_id
+    except IndexError:
+        update_id = None
 
     data = {"english": english, "tafsir": tafsir}
 
@@ -70,6 +76,8 @@ def main():
         except telegram.TelegramError as e:
             if e.message in ("Bad Gateway", "Timed out"):
                 sleep(3)
+            elif e.message == "Unauthorized":
+                update_id += 1
             else:
                 raise e
         except URLError as e:
