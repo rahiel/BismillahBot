@@ -75,7 +75,7 @@ def main():
             update_id = serve(bot, update_id, data)
         except telegram.TelegramError as e:
             if e.message in ("Bad Gateway", "Timed out"):
-                sleep(3)
+                sleep(2)
             elif e.message == "Unauthorized":
                 update_id += 1
             else:
@@ -141,7 +141,7 @@ def serve(bot, update_id, data):
 
     for update in bot.getUpdates(offset=update_id, timeout=10):
         chat_id = update.message.chat_id
-        update_id = update.update_id + 1  # put in redis?
+        update_id = update.update_id + 1
         message = update.message.text.encode("utf-8").lower()
         state = get_user(chat_id)
         if state is not None:
@@ -157,8 +157,8 @@ def serve(bot, update_id, data):
         if message.startswith('/'):
             command = message[1:]
             if command in ("start", "help"):
-                text = ("Send me the numbers of a surah and ayah, for example"
-                        " '2 255' and I respond with that ayah from the Noble "
+                text = ("Send me the numbers of a surah and ayah, for example:"
+                        " 2 255. Then I respond with that ayah from the Noble "
                         "Quran. Or type: random.")
             elif command == "about":
                 text = ("The English translation is by Imam Ahmed Raza from "
@@ -172,7 +172,7 @@ def serve(bot, update_id, data):
             bot.sendMessage(chat_id=chat_id, text=text)
             continue
 
-        match = re.match("(\d+)[ :]*(\d*)", message)
+        match = re.match("(\d+)[ :\-;.,]*(\d*)", message)
         if match is not None:
             s = int(match.group(1))
             a = int(match.group(2)) if match.group(2) else 1
