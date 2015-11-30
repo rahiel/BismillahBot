@@ -96,7 +96,8 @@ def serve(bot, update_id, data):
             return
         elif quran_type in ("english", "tafsir"):
             text = data[quran_type].getAyah(s, a)
-            bot.sendMessage(chat_id=chat_id, text=text, reply_markup=reply_markup)
+            bot.sendMessage(chat_id=chat_id, text=text[:4030],
+                            reply_markup=reply_markup)
         elif quran_type == "arabic":
             bot.sendChatAction(chat_id=chat_id,
                                action=telegram.ChatAction.UPLOAD_PHOTO)
