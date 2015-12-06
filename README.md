@@ -40,7 +40,7 @@ In the same directory you should define a `secret.py` with the token you got
 from the [BotFather](https://telegram.me/botfather):
 
 ```python
-TOKEN = "<your-token-here"
+TOKEN = "<your-token-here>"
 ```
 
 Disable group chats for the bot by sending the BotFather the `/setjoingroups`
@@ -54,7 +54,8 @@ data:
 
 ```bash
 wget "http://tanzil.net/trans/en.ahmedraza"
-wget "https://drive.google.com/uc?export=download&id=0B24P_FGD7V4jeTVaMXpaUFNiMlk" -O "Al_Jalalain_Eng.txt"
+wget "http://www.altafsir.com/Books/Al_Jalalain_Eng.pdf"
+pdftotext -nopgbrk Al_Jalalain_Eng.pdf
 wget "http://www.everyayah.com/data/Husary_128kbps/000_versebyverse.zip"
 unzip -d Husary 000_versebyverse.zip
 wget "http://www.everyayah.com/data/quranpngs/000_images.zip"

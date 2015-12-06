@@ -61,8 +61,6 @@ def get_file(filename):
 def main():
     bot = telegram.Bot(token=TOKEN)
 
-    # get the first pending update_id, this is so we can skip over it in case
-    # we get an "Unauthorized" exception.
     try:
         update_id = bot.getUpdates()[0].update_id
     except IndexError:
@@ -155,6 +153,9 @@ def serve(bot, update_id, data):
         if chat_id < 0:
             continue            # bot should not be in a group
 
+        # "special:quran_type"
+        special_state = quran_type.split(':')
+
         if message.startswith('/'):
             command = message[1:]
             if command in ("start", "help"):
@@ -166,12 +167,31 @@ def serve(bot, update_id, data):
                         "tanzil.net/trans/. The audio is a recitation by "
                         "Shaykh Mahmoud Khalil al-Husary from everyayah.com. "
                         "The tafsir is Tafsir al-Jalalayn from altafsir.com."
-                        "The source code of the bot is available at: "
+                        "The source code of BismillahBot is available at: "
                         "https://github.com/rahiel/BismillahBot.")
+            elif command == "feedback":
+                text = ("Jazak Allahu khayran! Your feedback is highly "
+                        "appreciated and will help us improve our services. "
+                        "Your next message will be sent to the developers. "
+                        "Send /cancel to cancel.")
+                save_user(chat_id, (s, a, "feedback:" + quran_type))
+            elif command == "cancel":
+                text = ("Cancelled.")
+                if len(special_state) > 1:
+                    save_user(chat_id, (s, a, special_state[1]))
             else:
                 text = "Invalid command"
             bot.sendMessage(chat_id=chat_id, text=text)
             continue
+
+        if len(special_state) > 1:
+            if special_state[0] == "feedback":
+                with open("feedback.txt", 'a') as f:
+                    f.write("%d: %s\n" % (chat_id, message))
+                text = "Feedback saved " + telegram.Emoji.SMILING_FACE_WITH_SMILING_EYES
+                bot.sendMessage(chat_id=chat_id, text=text)
+                save_user(chat_id, (s, a, special_state[1]))
+                continue
 
         match = re.match("(\d+)[ :\-;.,]*(\d*)", message)
         if match is not None:
@@ -193,5 +213,5 @@ def serve(bot, update_id, data):
     return update_id
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
