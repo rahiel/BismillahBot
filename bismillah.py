@@ -19,6 +19,7 @@
 import re
 from time import sleep
 from urllib2 import URLError
+from time import time
 import sys
 
 import telegram
@@ -148,7 +149,7 @@ def serve(bot, update_id, data):
         else:
             s, a, quran_type = 1, 1, "english"
 
-        print("%d: %s" % (chat_id, message))
+        print("%d:%.3f:%s" % (chat_id, time(), message))
 
         if chat_id < 0:
             continue            # bot should not be in a group

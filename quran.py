@@ -109,14 +109,14 @@ class Quran(object):
         """Get range of Ayahs as tuple """
         return ' '.join(self.text[surah - 1][a - 1:b]) + " (%d:%d-%d)" % (surah, a, b)
 
-    @classmethod
-    def getRandomAyah(cls):
+    @staticmethod
+    def getRandomAyah():
         surah = randint(1, 114)
         ayah = randint(1, Quran.surah_lengths[surah])
         return surah, ayah
 
-    @classmethod
-    def getNextAyah(cls, s, a):
+    @staticmethod
+    def getNextAyah(s, a):
         length = Quran.surah_lengths[s]
         if a == length:
             s = s + 1 if s < 114 else 1
@@ -125,8 +125,8 @@ class Quran(object):
             a += 1
         return s, a
 
-    @classmethod
-    def getPreviousAyah(cls, s, a):
+    @staticmethod
+    def getPreviousAyah(s, a):
         if a == 1:
             s = s - 1 if s > 1 else 114
             a = Quran.surah_lengths[s]
