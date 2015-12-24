@@ -14,7 +14,8 @@ def parse_quran_trans():
     def process_verse(verse):
         """Add verse and replace for Arabic ligatures (salawat)"""
         return (verse.strip()
-                .replace("– peace and blessings be upon him", 'ﷺ‎'))
+                .replace("– peace and blessings be upon him", 'ﷺ‎')
+                .decode("utf-8"))
 
     with open("en.ahmedraza", 'r') as f:
         for line in f.readlines():
@@ -48,7 +49,7 @@ def parse_quran_tafsir():
 
     def add_line(line, verse):
         """Add line and replace for Arabic ligatures (salawat)"""
-        verse.append(line.strip().replace("(s)", 'ﷺ‎'))
+        verse.append(line.strip().replace("(s)", 'ﷺ‎').decode("utf-8"))
 
     with open("Al_Jalalain_Eng.txt", 'r') as f:
         for line in f.readlines():
