@@ -33,7 +33,7 @@ dependencies on Ubuntu:
 sudo apt-get install redis-server git python-pip
 git clone https://github.com/rahiel/BismillahBot.git
 cd BismillahBot/
-pip install python-telegram-bot redis hiredis ujson
+pip install -r requirements.txt
 ```
 
 In the same directory you should define a `secret.py` with the token you got
@@ -93,7 +93,7 @@ directory:
 
 ```bash
 git pull
-pip install -U python-telegram-bot redis hiredis ujson
+pip install -r requirements.txt -U
 ```
 
 # License
