@@ -32,7 +32,7 @@ from secret import TOKEN
 
 english = Quran("translation")
 tafsir = Quran("tafsir")
-r = StrictRedis()
+r = StrictRedis(unix_socket_path="/tmp/redis.sock")
 redis_namespace = ""
 
 
