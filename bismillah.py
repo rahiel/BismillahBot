@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###############################################################################
 # BismillahBot -- Explore the Noble Qur'an on Telegram                        #
-# Copyright (C) 2015  Rahiel Kasim                                            #
+# Copyright (C) 1436-1437 AH  Rahiel Kasim                                    #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU Affero General Public License as published by #
@@ -17,9 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.       #
 ###############################################################################
 import re
-from time import sleep
-from urllib2 import URLError
-from time import time
+from time import sleep, time
 import sys
 
 import telegram
@@ -73,14 +71,14 @@ def main():
         try:
             update_id = serve(bot, update_id, data)
         except telegram.TelegramError as e:
-            if e.message in ("Bad Gateway", "Timed out"):
-                sleep(2)
+            if e.message in ("Bad Gateway", "Timed out") or (
+                    e.message.startswith("URLError") or
+                    e.message.startswith("HTTPException")):
+                sleep(1)
             elif e.message == "Unauthorized":
                 update_id += 1
             else:
                 raise e
-        except URLError as e:
-            sleep(2)
 
 
 def serve(bot, update_id, data):
