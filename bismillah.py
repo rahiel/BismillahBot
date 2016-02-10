@@ -21,6 +21,7 @@ from time import sleep, time
 import sys
 
 import telegram
+from telegram.error import NetworkError, Unauthorized
 from redis import StrictRedis
 import ujson as json
 
@@ -70,15 +71,10 @@ def main():
     while True:
         try:
             update_id = serve(bot, update_id, data)
-        except telegram.TelegramError as e:
-            if e.message in ("Bad Gateway", "Timed out") or (
-                    e.message.startswith("URLError") or
-                    e.message.startswith("HTTPException")):
-                sleep(1)
-            elif e.message == "Unauthorized":
-                update_id += 1
-            else:
-                raise e
+        except NetworkError:
+            sleep(0.2)
+        except Unauthorized:  # user has removed or blocked the bot
+            update_id += 1
 
 
 def serve(bot, update_id, data):
