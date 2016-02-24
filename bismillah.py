@@ -143,7 +143,7 @@ def serve(bot, update_id, data):
         else:
             s, a, quran_type = 1, 1, "english"
 
-        print("%d:%.3f:%s" % (chat_id, time(), message))
+        print("%d:%.3f:%s" % (chat_id, time(), message.replace('\n', ' ')))
 
         if chat_id < 0:
             continue            # bot should not be in a group
