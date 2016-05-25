@@ -134,6 +134,8 @@ def serve(bot, update_id, data):
             upload_from_disk()
 
     for update in bot.getUpdates(offset=update_id, timeout=10):
+        if not update.message:  # weird Telegram update with only an update_id
+            continue
         chat_id = update.message.chat_id
         update_id = update.update_id + 1
         message = update.message.text.encode("utf-8").lower()

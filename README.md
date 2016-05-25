@@ -1,3 +1,5 @@
+# BismillahBot
+
 بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ
 
 BismillahBot is a bot on telegram to explore the Qur'an.
@@ -24,13 +26,12 @@ The bot can be used by messaging
 
 You can run your own instance of BismillahBot. First you need to request a
 [bot username and token](https://core.telegram.org/bots#3-how-do-i-create-a-bot).
-You also need a Unix system to run the bot on. BismillahBot is running on a
-[DigitalOcean droplet](https://www.digitalocean.com/?refcode=8b7b76e3230d)
-(referral link) running Ubuntu. The following gets the code, and installs the
-dependencies on Ubuntu:
+You also need a Unix-like system to run the bot on. BismillahBot is running on a
+Debian server. The following gets the code, and installs the dependencies on
+Debian/Ubuntu:
 
 ```bash
-sudo apt-get install redis-server git python-pip
+sudo apt install redis-server git python-pip python-dev
 git clone https://github.com/rahiel/BismillahBot.git
 cd BismillahBot/
 pip install -r requirements.txt
