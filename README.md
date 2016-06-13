@@ -63,6 +63,7 @@ data:
 
 ```bash
 wget "http://tanzil.net/trans/en.ahmedraza"
+wget "http://tanzil.net/res/text/metadata/quran-data.xml"
 wget "http://www.altafsir.com/Books/Al_Jalalain_Eng.pdf"
 pdftotext -nopgbrk Al_Jalalain_Eng.pdf
 wget "http://www.everyayah.com/data/Husary_128kbps/000_versebyverse.zip"

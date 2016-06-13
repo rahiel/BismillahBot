@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 from random import randint
+import xml.etree.ElementTree as ET
 
 
 def parse_quran_trans():
@@ -134,6 +135,25 @@ class Quran(object):
         else:
             a -= 1
         return s, a
+
+
+def make_index():
+    """An index of the Surahs in the Quran, formatted to send over Telegram."""
+    suras = ET.parse("quran-data.xml").getroot().find("suras")
+    chapters = [s.attrib["tname"] for s in suras]
+    # padding...
+    for i in range(9):
+        chapters[i] = ' ' + chapters[i] + ' ' * (14 - len(chapters[i]))
+    for i in range(9, 58):
+        chapters[i] += ' ' * (14 - len(chapters[i]))
+
+    index = []
+    left = range(1, 58)
+    right = range(58, 115)
+    for i, j in zip(left, right):
+        index.append("/{} <code>{}</code>/{} {}"
+                     .format(i, chapters[i - 1], j, chapters[j - 1]))
+    return '\n'.join(index)
 
 
 def save_json(quran):

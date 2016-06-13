@@ -25,14 +25,16 @@ from telegram.error import NetworkError, Unauthorized
 from redis import StrictRedis
 import ujson as json
 
-from quran import Quran
+from quran import Quran, make_index
 from secret import TOKEN
 
 
 english = Quran("translation")
 tafsir = Quran("tafsir")
+index = make_index()
 r = StrictRedis(unix_socket_path="/tmp/redis.sock")
 redis_namespace = ""
+update_id = None
 
 
 def save_user(chat_id, state):
@@ -59,6 +61,7 @@ def get_file(filename):
 
 
 def main():
+    global update_id
     bot = telegram.Bot(token=TOKEN)
 
     try:
@@ -70,14 +73,15 @@ def main():
 
     while True:
         try:
-            update_id = serve(bot, update_id, data)
+            serve(bot, data)
         except NetworkError:
             sleep(0.2)
         except Unauthorized:  # user has removed or blocked the bot
             update_id += 1
 
 
-def serve(bot, update_id, data):
+def serve(bot, data):
+    global update_id
     interface = telegram.ReplyKeyboardMarkup(
         [["Arabic", "Audio", "English", "Tafsir"],
          ["Previous", "Random", "Next"]],
@@ -155,10 +159,11 @@ def serve(bot, update_id, data):
 
         if message.startswith('/'):
             command = message[1:]
+            parse_mode = None
             if command in ("start", "help"):
                 text = ("Send me the numbers of a surah and ayah, for example:"
                         " 2 255. Then I respond with that ayah from the Noble "
-                        "Quran. Or type: random.")
+                        "Quran. Type /index to see all Surahs or try /random.")
             elif command == "about":
                 text = ("The English translation is by Imam Ahmed Raza from "
                         "tanzil.net/trans/. The audio is a recitation by "
@@ -166,6 +171,9 @@ def serve(bot, update_id, data):
                         "The tafsir is Tafsir al-Jalalayn from altafsir.com."
                         "The source code of BismillahBot is available at: "
                         "https://github.com/rahiel/BismillahBot.")
+            elif command == "index":
+                text = index
+                parse_mode = "HTML"
             elif command == "feedback":
                 text = ("Jazak Allahu khayran! Your feedback is highly "
                         "appreciated and will help us improve our services. "
@@ -177,9 +185,10 @@ def serve(bot, update_id, data):
                 if len(special_state) > 1:
                     save_user(chat_id, (s, a, special_state[1]))
             else:
-                text = "Invalid command"
-            bot.sendMessage(chat_id=chat_id, text=text)
-            continue
+                text = None  # "Invalid command"
+            if text:
+                bot.sendMessage(chat_id=chat_id, text=text, parse_mode=parse_mode)
+                continue
 
         if len(special_state) > 1:
             if special_state[0] == "feedback":
@@ -190,24 +199,26 @@ def serve(bot, update_id, data):
                 save_user(chat_id, (s, a, special_state[1]))
                 continue
 
-        match = re.match("(\d+)[ :\-;.,]*(\d*)", message)
-        if match is not None:
-            s = int(match.group(1))
-            a = int(match.group(2)) if match.group(2) else 1
-            send_quran(s, a, quran_type, chat_id, reply_markup=interface)
-        elif message in ("english", "tafsir", "audio", "arabic"):
-                send_quran(s, a, message, chat_id)
-        elif message in ("next", "previous", "random"):
+        if message in ("english", "tafsir", "audio", "arabic"):
+            send_quran(s, a, message, chat_id)
+            continue
+        elif message in ("next", "previous", "random", "/random"):
             if message == "next":
                 s, a = Quran.getNextAyah(s, a)
             elif message == "previous":
                 s, a = Quran.getPreviousAyah(s, a)
-            elif message == "random":
+            elif message in ("random", "/random"):
                 s, a = Quran.getRandomAyah()
             send_quran(s, a, quran_type, chat_id)
+            continue
+
+        match = re.match("/?(\d+)[ :\-;.,]*(\d*)", message)
+        if match is not None:
+            s = int(match.group(1))
+            a = int(match.group(2)) if match.group(2) else 1
+            send_quran(s, a, quran_type, chat_id, reply_markup=interface)
 
     sys.stdout.flush()
-    return update_id
 
 
 if __name__ == "__main__":
