@@ -21,7 +21,7 @@ from time import sleep, time
 import sys
 
 import telegram
-from telegram.error import NetworkError, Unauthorized
+from telegram.error import NetworkError, Unauthorized, TelegramError
 from redis import StrictRedis
 import ujson as json
 
@@ -75,9 +75,14 @@ def main():
         try:
             serve(bot, data)
         except NetworkError:
-            sleep(0.2)
+            sleep(1)
         except Unauthorized:  # user has removed or blocked the bot
             update_id += 1
+        except TelegramError as e:
+            if "Invalid server response" in str(e):
+                sleep(3)
+            else:
+                raise e
 
 
 def serve(bot, data):
