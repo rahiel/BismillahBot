@@ -98,7 +98,7 @@ def serve(bot, data):
             return
         elif quran_type in ("english", "tafsir"):
             text = data[quran_type].getAyah(s, a)
-            bot.sendMessage(chat_id=chat_id, text=text[:4030],
+            bot.sendMessage(chat_id=chat_id, text=text[:telegram.constants.MAX_MESSAGE_LENGTH],
                             reply_markup=reply_markup)
         elif quran_type == "arabic":
             bot.sendChatAction(chat_id=chat_id,
@@ -147,7 +147,7 @@ def serve(bot, data):
         if not update.message:  # weird Telegram update with only an update_id
             continue
         chat_id = update.message.chat_id
-        message = update.message.text.encode("utf-8").lower()
+        message = update.message.text.lower()
         state = get_user(chat_id)
         if state is not None:
             s, a, quran_type = state

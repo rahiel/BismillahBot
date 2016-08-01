@@ -28,12 +28,14 @@ You can run your own instance of BismillahBot. First you need to request a
 [bot username and token](https://core.telegram.org/bots#3-how-do-i-create-a-bot).
 You also need a Unix-like system to run the bot on. BismillahBot is running on a
 Debian server. The following gets the code, and installs the dependencies on
-Debian/Ubuntu:
+Debian/Ubuntu in a virtualenv:
 
 ```bash
-sudo apt install redis-server git python-pip python-dev
+sudo apt install redis-server git python3-pip python3-dev virtualenv
 git clone https://github.com/rahiel/BismillahBot.git
 cd BismillahBot/
+virtualenv -p python3 venv
+. venv/bin/activate
 pip install -r requirements.txt
 ```
 
@@ -86,7 +88,8 @@ currently hardcoded in the bot, so
 [file an issue](https://github.com/rahiel/BismillahBot/issues/new) if you'd like
 to use different data.
 
-If all went fine you can now run the bot with `python bismillah.py`.
+If all went fine you can now run the bot with `python bismillah.py` in the
+virtualenv.
 
 ## Updating
 
