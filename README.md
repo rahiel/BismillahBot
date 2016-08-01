@@ -36,7 +36,7 @@ git clone https://github.com/rahiel/BismillahBot.git
 cd BismillahBot/
 virtualenv -p python3 venv
 . venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements.txt --upgrade
 ```
 
 In the same directory you should define a `secret.py` with the token you got
@@ -88,8 +88,7 @@ currently hardcoded in the bot, so
 [file an issue](https://github.com/rahiel/BismillahBot/issues/new) if you'd like
 to use different data.
 
-If all went fine you can now run the bot with `python bismillah.py` in the
-virtualenv.
+If all went fine you can now run the bot with `python bismillah.py`.
 
 ## Updating
 
@@ -98,6 +97,7 @@ directory:
 
 ```bash
 git pull
+. venv/bin/activate
 pip install -r requirements.txt -U
 ```
 
