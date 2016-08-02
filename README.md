@@ -81,6 +81,18 @@ recitation by
 [Shaykh Mahmoud Khalil al-Husary](https://en.wikipedia.org/wiki/Mahmoud_Khalil_Al-Hussary)
 and the Quranic text in images.
 
+We do some post-processing on the images. First we remove the empty area's from
+the edges with [ImageMagick](https://www.imagemagick.org/script/index.php) and
+[GNU parallel](https://www.gnu.org/software/parallel/):
+``` shell
+cd quran_images/
+parallel "echo {}; convert {} -trim {}" ::: *.png
+```
+Then we optimize the images with [pngout](http://www.jonof.id.au/kenutils):
+``` shell
+parallel "pngout {}" ::: *.png
+```
+
 You could use other data files, like
 [other translations](http://tanzil.net/trans/) or
 [audio recitations](http://www.everyayah.com/data/status.php). These choices are
