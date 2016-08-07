@@ -224,11 +224,11 @@ def serve(bot, data):
 
         if message.startswith('/'):
             command = message[1:]
-            parse_mode = None
             if command in ("start", "help"):
                 text = ("Send me the numbers of a surah and ayah, for example:"
-                        " 2:255. Then I respond with that ayah from the Noble "
-                        "Quran. Type /index to see all Surahs or try /random.")
+                        " <b>2:255</b>. Then I respond with that ayah from the Noble "
+                        "Quran. Type /index to see all Surahs or try /random. "
+                        "I'm available in any chat on Telegram, just type: <b>@BismillahBot</b>")
             elif command == "about":
                 text = ("The English translation is by Imam Ahmed Raza from "
                         "tanzil.net/trans/. The audio is a recitation by "
@@ -238,7 +238,6 @@ def serve(bot, data):
                         "https://github.com/rahiel/BismillahBot.")
             elif command == "index":
                 text = data["index"]
-                parse_mode = "HTML"
             elif command == "feedback":
                 text = ("Jazak Allahu khayran! Your feedback is highly "
                         "appreciated and will help us improve our services. "
@@ -252,7 +251,7 @@ def serve(bot, data):
             else:
                 text = None  # "Invalid command"
             if text:
-                bot.sendMessage(chat_id=chat_id, text=text, parse_mode=parse_mode)
+                bot.sendMessage(chat_id=chat_id, text=text, parse_mode="HTML")
                 continue
 
         if len(special_state) > 1:
