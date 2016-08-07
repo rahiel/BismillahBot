@@ -21,7 +21,9 @@ from time import sleep, time
 import sys
 
 import telegram
+from telegram.constants import MAX_MESSAGE_LENGTH
 from telegram.error import NetworkError, Unauthorized, TelegramError
+from telegram import InlineQueryResultArticle, InputTextMessageContent
 from redis import StrictRedis
 import ujson as json
 
@@ -29,9 +31,6 @@ from quran import Quran, make_index
 from secret import TOKEN
 
 
-english = Quran("translation")
-tafsir = Quran("tafsir")
-index = make_index()
 r = StrictRedis(unix_socket_path="/tmp/redis.sock")
 redis_namespace = ""
 update_id = None
@@ -60,6 +59,61 @@ def get_file(filename):
         return json.loads(f)
 
 
+def get_audio_filename(s, a):
+    return "Husary/" + str(s).zfill(3) + str(a).zfill(3) + ".mp3"
+
+
+def get_image_filename(s, a):
+    return "quran_images/" + str(s) + '_' + str(a) + ".png"
+
+
+def send_file(bot, filename, quran_type, **kwargs):
+    """Tries to send file from Telegram's cache, only uploads from disk if necessary.
+    Always saves the Telegram cache file_id in Redis and returns it.
+    """
+
+    def upload(f):
+        if quran_type == "arabic":
+            v = bot.sendPhoto(photo=f, **kwargs)["photo"][-1]["file_id"]
+        elif quran_type == "audio":
+            v = bot.sendAudio(audio=f, **kwargs)["audio"]["file_id"]
+        save_file(filename, v)
+        return v
+
+    def upload_from_disk():
+        with open(filename, "rb") as f:
+            return upload(f)
+
+    f = get_file(filename)
+    if f is not None:
+        try:
+            return upload(f)
+        except telegram.TelegramError as e:
+            if "file_id" in e.message:
+                return upload_from_disk()
+            else:
+                raise e
+    else:
+        return upload_from_disk()
+
+
+def get_default_query_results(quran):
+    results = []
+    ayat = [
+        (13, 28), (33, 56), (2, 62), (10, 31), (17, 36), (5, 32), (39, 9), (17, 44),
+        (7, 57), (3, 7), (2, 255), (57, 20), (49, 12), (16, 125), (24, 35)
+    ]
+    for s, a in ayat:
+        ayah = "%d:%d" % (s, a)
+        english = quran.getAyah(s, a)
+        results.append(InlineQueryResultArticle(
+            ayah + "def", title=ayah,
+            description=english[:120],
+            input_message_content=InputTextMessageContent(english))
+        )
+    return results
+
+
 def main():
     global update_id
     bot = telegram.Bot(token=TOKEN)
@@ -69,7 +123,18 @@ def main():
     except IndexError:
         update_id = None
 
-    data = {"english": english, "tafsir": tafsir}
+    interface = telegram.ReplyKeyboardMarkup(
+        [["Arabic", "Audio", "English", "Tafsir"],
+         ["Previous", "Random", "Next"]],
+        resize_keyboard=True)
+
+    data = {
+        "english": Quran("translation"),
+        "tafsir": Quran("tafsir"),
+        "index": make_index(),
+        "interface": interface
+    }
+    data["default_query_results"] = get_default_query_results(data["english"])
 
     while True:
         try:
@@ -87,65 +152,60 @@ def main():
 
 def serve(bot, data):
     global update_id
-    interface = telegram.ReplyKeyboardMarkup(
-        [["Arabic", "Audio", "English", "Tafsir"],
-         ["Previous", "Random", "Next"]],
-        resize_keyboard=True)
 
     def send_quran(s, a, quran_type, chat_id, reply_markup=None):
-        if not (0 < s < 115 and 0 < a <= Quran.surah_lengths[s]):
-            bot.sendMessage(chat_id=chat_id, text="Ayah does not exist!")
-            return
-        elif quran_type in ("english", "tafsir"):
+        if quran_type in ("english", "tafsir"):
             text = data[quran_type].getAyah(s, a)
-            bot.sendMessage(chat_id=chat_id, text=text[:telegram.constants.MAX_MESSAGE_LENGTH],
+            bot.sendMessage(chat_id=chat_id, text=text[:MAX_MESSAGE_LENGTH],
                             reply_markup=reply_markup)
         elif quran_type == "arabic":
             bot.sendChatAction(chat_id=chat_id,
                                action=telegram.ChatAction.UPLOAD_PHOTO)
-            image = "quran_images/" + str(s) + '_' + str(a) + ".png"
-            upload_file(image, quran_type, chat_id=chat_id,
-                        caption="Quran %d:%d" % (s, a),
-                        reply_markup=reply_markup)
+            image = get_image_filename(s, a)
+            send_file(bot, image, quran_type, chat_id=chat_id,
+                      caption="Quran %d:%d" % (s, a),
+                      reply_markup=reply_markup)
         elif quran_type == "audio":
             bot.sendChatAction(chat_id=chat_id,
                                action=telegram.ChatAction.UPLOAD_AUDIO)
-            audio = ("Husary/" + str(s).zfill(3) + str(a).zfill(3) + ".mp3")
-            upload_file(audio, quran_type, chat_id=chat_id,
-                        performer="Shaykh Mahmoud Khalil al-Husary",
-                        title="Quran %d:%d" % (s, a),
-                        reply_markup=reply_markup)
+            audio = get_audio_filename(s, a)
+            send_file(bot, audio, quran_type, chat_id=chat_id,
+                      performer="Shaykh Mahmoud Khalil al-Husary",
+                      title="Quran %d:%d" % (s, a),
+                      reply_markup=reply_markup)
         save_user(chat_id, [s, a, quran_type])
-
-    def upload_file(filename, quran_type, **kwargs):
-
-        def upload(f):
-            if quran_type == "arabic":
-                v = bot.sendPhoto(photo=f, **kwargs)["photo"][-1]["file_id"]
-            elif quran_type == "audio":
-                v = bot.sendAudio(audio=f, **kwargs)["audio"]["file_id"]
-            save_file(filename, v)
-
-        def upload_from_disk():
-            with open(filename, "rb") as f:
-                upload(f)
-
-        f = get_file(filename)
-        if f is not None:
-            try:
-                upload(f)
-            except telegram.TelegramError as e:
-                if "file_id" in e.message:
-                    upload_from_disk()
-                else:
-                    raise e
-        else:
-            upload_from_disk()
 
     for update in bot.getUpdates(offset=update_id, timeout=10):
         update_id = update.update_id + 1
+
+        if update.inline_query:
+            query_id = update.inline_query.id
+            query = update.inline_query.query
+            results = []
+            cache_time = 7 * (60 ** 2 * 24)
+            s, a = parse_ayah(query)
+            if s is not None and Quran.exists(s, a):
+                ayah = "%d:%d" % (s, a)
+                english = data["english"].getAyah(s, a)
+                tafsir = data["tafsir"].getAyah(s, a)
+                results.append(InlineQueryResultArticle(
+                    ayah + "english", title="English",
+                    description=english[:120],
+                    input_message_content=InputTextMessageContent(english))
+                )
+                results.append(InlineQueryResultArticle(
+                    ayah + "tafsir", title="Tafsir",
+                    description=tafsir[:120],
+                    input_message_content=InputTextMessageContent(tafsir))
+                )
+            else:
+                results = data["default_query_results"]
+            bot.answerInlineQuery(inline_query_id=query_id, cache_time=cache_time, results=results)
+            continue
+
         if not update.message:  # weird Telegram update with only an update_id
             continue
+
         chat_id = update.message.chat_id
         message = update.message.text.lower()
         state = get_user(chat_id)
@@ -167,7 +227,7 @@ def serve(bot, data):
             parse_mode = None
             if command in ("start", "help"):
                 text = ("Send me the numbers of a surah and ayah, for example:"
-                        " 2 255. Then I respond with that ayah from the Noble "
+                        " 2:255. Then I respond with that ayah from the Noble "
                         "Quran. Type /index to see all Surahs or try /random.")
             elif command == "about":
                 text = ("The English translation is by Imam Ahmed Raza from "
@@ -177,7 +237,7 @@ def serve(bot, data):
                         "The source code of BismillahBot is available at: "
                         "https://github.com/rahiel/BismillahBot.")
             elif command == "index":
-                text = index
+                text = data["index"]
                 parse_mode = "HTML"
             elif command == "feedback":
                 text = ("Jazak Allahu khayran! Your feedback is highly "
@@ -217,13 +277,24 @@ def serve(bot, data):
             send_quran(s, a, quran_type, chat_id)
             continue
 
-        match = re.match("/?(\d+)[ :\-;.,]*(\d*)", message)
-        if match is not None:
-            s = int(match.group(1))
-            a = int(match.group(2)) if match.group(2) else 1
-            send_quran(s, a, quran_type, chat_id, reply_markup=interface)
+        s, a = parse_ayah(message)
+        if s:
+            if Quran.exists(s, a):
+                send_quran(s, a, quran_type, chat_id, reply_markup=data["interface"])
+            else:
+                bot.sendMessage(chat_id=chat_id, text="Ayah does not exist!")
 
     sys.stdout.flush()
+
+
+def parse_ayah(message):
+    match = re.match("/?(\d+)[ :\-;.,]*(\d*)", message)
+    if match is not None:
+        s = int(match.group(1))
+        a = int(match.group(2)) if match.group(2) else 1
+        return s, a
+    else:
+        return None, None
 
 
 if __name__ == "__main__":

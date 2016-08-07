@@ -135,6 +135,10 @@ class Quran(object):
             a -= 1
         return s, a
 
+    @staticmethod
+    def exists(s, a):
+        return 0 < s < 115 and 0 < a <= Quran.surah_lengths[s]
+
 
 def make_index():
     """An index of the Surahs in the Quran, formatted to send over Telegram."""
