@@ -100,8 +100,8 @@ def send_file(bot, filename, quran_type, **kwargs):
 def get_default_query_results(quran):
     results = []
     ayat = [
-        (13, 28), (33, 56), (2, 62), (10, 31), (17, 36), (5, 32), (39, 9), (17, 44),
-        (7, 57), (3, 7), (2, 255), (57, 20), (49, 12), (16, 125), (24, 35)
+        (13, 28), (33, 56), (2, 62), (10, 31), (17, 36), (5, 32), (39, 9), (17, 44), (28, 88), (17, 84), (33, 6),
+        (7, 57), (3, 7), (2, 255), (63, 9), (57, 20), (49, 12), (16, 125), (24, 35), (73, 8)
     ]
     for s, a in ayat:
         ayah = "%d:%d" % (s, a)
@@ -182,7 +182,7 @@ def serve(bot, data):
             query_id = update.inline_query.id
             query = update.inline_query.query
             results = []
-            cache_time = 7 * (60 ** 2 * 24)
+            cache_time = 66 * (60 ** 2 * 24)
             s, a = parse_ayah(query)
             if s is not None and Quran.exists(s, a):
                 ayah = "%d:%d" % (s, a)
