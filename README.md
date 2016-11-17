@@ -2,7 +2,7 @@
 
 بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ
 
-BismillahBot is a bot on telegram to explore the Qur'an.
+BismillahBot is a bot on Telegram to explore the Qur'an.
 
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
 **Table of Contents**
@@ -17,10 +17,20 @@ BismillahBot is a bot on telegram to explore the Qur'an.
 
 # Usage
 
-The bot can be used by messaging
-[@Bismillahbot](https://telegram.me/BismillahBot) on
-[Telegram](https://telegram.org/). A conversation looks like
-![BismillahBot](https://i.imgur.com/kITXcHz.png "Sample conversation").
+Use the bot by messaging [Bismillahbot][] on [Telegram][]. For every verse the
+bot has an English translation from [Imam Ahmad Raza][], audio recitation
+by [Shaykh Mahmoud Khalil al-Husary][], and exegesis (tafsir)
+from [Tafsir al-Jalalayn][]. The translation and tafsir are available anywhere
+on Telegram via [inline mode][], just start a text with `@BismillahBot`. A
+conversation looks like: ![example]
+
+[BismillahBot]: https://telegram.me/BismillahBot
+[Telegram]: https://telegram.org/
+[Imam Ahmad Raza]: https://en.wikipedia.org/wiki/Ahmed_Raza_Khan_Barelvi
+[Shaykh Mahmoud Khalil al-Husary]: https://en.wikipedia.org/wiki/Mahmoud_Khalil_Al-Hussary
+[Tafsir al-Jalalayn]: http://www.altafsir.com/Al-Jalalayn.asp
+[inline mode]: https://telegram.org/blog/inline-bots
+[example]: https://i.imgur.com/kITXcHz.png "Example conversation"
 
 # Installation
 
@@ -73,13 +83,6 @@ unzip -d Husary 000_versebyverse.zip
 wget "http://www.everyayah.com/data/quranpngs/000_images.zip"
 unzip -d quran_images 000_images.zip
 ```
-
-This gets the Qur'an in an English rendition by
-[Imam Ahmed Raza Khan](https://en.wikipedia.org/wiki/Ahmed_Raza_Khan_Barelvi),
-the [Tafsir al-Jalalayn](http://www.altafsir.com/Al-Jalalayn.asp), audio
-recitation by
-[Shaykh Mahmoud Khalil al-Husary](https://en.wikipedia.org/wiki/Mahmoud_Khalil_Al-Hussary)
-and the Quranic text in images.
 
 We do some post-processing on the images. First we remove the empty area's from
 the edges with [ImageMagick](https://www.imagemagick.org/script/index.php) and
