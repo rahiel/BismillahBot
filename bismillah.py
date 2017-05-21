@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 ###############################################################################
-# BismillahBot -- Explore the Noble Qur'an on Telegram                        #
-# Copyright (C) 1436-1437 AH  Rahiel Kasim                                    #
+# BismillahBot -- Explore the Holy Qur'an on Telegram                         #
+# Copyright (C) 1436-1438 AH  Rahiel Kasim                                    #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU Affero General Public License as published by #
@@ -17,13 +16,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.       #
 ###############################################################################
 import re
-from time import sleep, time
 import sys
+from time import sleep, time
 
 import telegram
+from telegram import InlineQueryResultArticle, InputTextMessageContent
 from telegram.constants import MAX_MESSAGE_LENGTH
 from telegram.error import NetworkError, Unauthorized, TelegramError
-from telegram import InlineQueryResultArticle, InputTextMessageContent
 from redis import StrictRedis
 import ujson as json
 
@@ -64,7 +63,7 @@ def get_audio_filename(s, a):
 
 
 def get_image_filename(s, a):
-    return "quran_images/" + str(s) + '_' + str(a) + ".png"
+    return "quran_images/" + str(s) + "_" + str(a) + ".png"
 
 
 def send_file(bot, filename, quran_type, **kwargs):
@@ -74,9 +73,9 @@ def send_file(bot, filename, quran_type, **kwargs):
 
     def upload(f):
         if quran_type == "arabic":
-            v = bot.sendPhoto(photo=f, **kwargs)["photo"][-1]["file_id"]
+            v = bot.send_photo(photo=f, **kwargs)["photo"][-1]["file_id"]
         elif quran_type == "audio":
-            v = bot.sendAudio(audio=f, **kwargs)["audio"]["file_id"]
+            v = bot.send_audio(audio=f, **kwargs)["audio"]["file_id"]
         save_file(filename, v)
         return v
 
@@ -105,7 +104,7 @@ def get_default_query_results(quran):
     ]
     for s, a in ayat:
         ayah = "%d:%d" % (s, a)
-        english = quran.getAyah(s, a)
+        english = quran.get_ayah(s, a)
         results.append(InlineQueryResultArticle(
             ayah + "def", title=ayah,
             description=english[:120],
@@ -119,7 +118,7 @@ def main():
     bot = telegram.Bot(token=TOKEN)
 
     try:
-        update_id = bot.getUpdates()[0].update_id
+        update_id = bot.get_updates()[0].update_id
     except IndexError:
         update_id = None
 
@@ -155,19 +154,19 @@ def serve(bot, data):
 
     def send_quran(s, a, quran_type, chat_id, reply_markup=None):
         if quran_type in ("english", "tafsir"):
-            text = data[quran_type].getAyah(s, a)
-            bot.sendMessage(chat_id=chat_id, text=text[:MAX_MESSAGE_LENGTH],
-                            reply_markup=reply_markup)
+            text = data[quran_type].get_ayah(s, a)
+            bot.send_message(chat_id=chat_id, text=text[:MAX_MESSAGE_LENGTH],
+                             reply_markup=reply_markup)
         elif quran_type == "arabic":
-            bot.sendChatAction(chat_id=chat_id,
-                               action=telegram.ChatAction.UPLOAD_PHOTO)
+            bot.send_chat_action(chat_id=chat_id,
+                                 action=telegram.ChatAction.UPLOAD_PHOTO)
             image = get_image_filename(s, a)
             send_file(bot, image, quran_type, chat_id=chat_id,
                       caption="Quran %d:%d" % (s, a),
                       reply_markup=reply_markup)
         elif quran_type == "audio":
-            bot.sendChatAction(chat_id=chat_id,
-                               action=telegram.ChatAction.UPLOAD_AUDIO)
+            bot.send_chat_action(chat_id=chat_id,
+                                 action=telegram.ChatAction.UPLOAD_AUDIO)
             audio = get_audio_filename(s, a)
             send_file(bot, audio, quran_type, chat_id=chat_id,
                       performer="Shaykh Mahmoud Khalil al-Husary",
@@ -175,7 +174,7 @@ def serve(bot, data):
                       reply_markup=reply_markup)
         save_user(chat_id, [s, a, quran_type])
 
-    for update in bot.getUpdates(offset=update_id, timeout=10):
+    for update in bot.get_updates(offset=update_id, timeout=10):
         update_id = update.update_id + 1
 
         if update.inline_query:
@@ -186,8 +185,8 @@ def serve(bot, data):
             s, a = parse_ayah(query)
             if s is not None and Quran.exists(s, a):
                 ayah = "%d:%d" % (s, a)
-                english = data["english"].getAyah(s, a)
-                tafsir = data["tafsir"].getAyah(s, a)
+                english = data["english"].get_ayah(s, a)
+                tafsir = data["tafsir"].get_ayah(s, a)
                 results.append(InlineQueryResultArticle(
                     ayah + "english", title="English",
                     description=english[:120],
@@ -200,7 +199,7 @@ def serve(bot, data):
                 )
             else:
                 results = data["default_query_results"]
-            bot.answerInlineQuery(inline_query_id=query_id, cache_time=cache_time, results=results)
+            bot.answer_inline_query(inline_query_id=query_id, cache_time=cache_time, results=results)
             continue
 
         if not update.message:  # weird Telegram update with only an update_id
@@ -214,19 +213,19 @@ def serve(bot, data):
         else:
             s, a, quran_type = 1, 1, "english"
 
-        print("%d:%.3f:%s" % (chat_id, time(), message.replace('\n', ' ')))
+        print("%d:%.3f:%s" % (chat_id, time(), message.replace("\n", " ")))
 
         if chat_id < 0:
             continue            # bot should not be in a group
 
         # "special:quran_type"
-        special_state = quran_type.split(':')
+        special_state = quran_type.split(":")
 
-        if message.startswith('/'):
+        if message.startswith("/"):
             command = message[1:]
             if command in ("start", "help"):
                 text = ("Send me the numbers of a surah and ayah, for example:"
-                        " <b>2:255</b>. Then I respond with that ayah from the Noble "
+                        " <b>2:255</b>. Then I respond with that ayah from the Holy "
                         "Quran. Type /index to see all Surahs or try /random. "
                         "I'm available in any chat on Telegram, just type: <b>@BismillahBot</b>")
             elif command == "about":
@@ -251,15 +250,15 @@ def serve(bot, data):
             else:
                 text = None  # "Invalid command"
             if text:
-                bot.sendMessage(chat_id=chat_id, text=text, parse_mode="HTML")
+                bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML")
                 continue
 
         if len(special_state) > 1:
             if special_state[0] == "feedback":
-                with open("feedback.txt", 'a') as f:
+                with open("feedback.txt", "a") as f:
                     f.write("%d: %s\n" % (chat_id, message))
                 text = "Feedback saved 😊"
-                bot.sendMessage(chat_id=chat_id, text=text)
+                bot.send_message(chat_id=chat_id, text=text)
                 save_user(chat_id, (s, a, special_state[1]))
                 continue
 
@@ -268,11 +267,11 @@ def serve(bot, data):
             continue
         elif message in ("next", "previous", "random", "/random"):
             if message == "next":
-                s, a = Quran.getNextAyah(s, a)
+                s, a = Quran.get_next_ayah(s, a)
             elif message == "previous":
-                s, a = Quran.getPreviousAyah(s, a)
+                s, a = Quran.get_previous_ayah(s, a)
             elif message in ("random", "/random"):
-                s, a = Quran.getRandomAyah()
+                s, a = Quran.get_random_ayah()
             send_quran(s, a, quran_type, chat_id)
             continue
 
@@ -281,7 +280,7 @@ def serve(bot, data):
             if Quran.exists(s, a):
                 send_quran(s, a, quran_type, chat_id, reply_markup=data["interface"])
             else:
-                bot.sendMessage(chat_id=chat_id, text="Ayah does not exist!")
+                bot.send_message(chat_id=chat_id, text="Ayah does not exist!")
 
     sys.stdout.flush()
 

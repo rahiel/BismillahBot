@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import re
 from random import randint
 import xml.etree.ElementTree as ET
@@ -15,13 +14,13 @@ def parse_quran_trans():
     def process_verse(verse):
         """Add verse and replace for Arabic ligatures (salawat)"""
         return (verse.strip()
-                .replace("– peace and blessings be upon him", 'ﷺ‎'))
+                .replace("– peace and blessings be upon him", "ﷺ‎"))
 
-    with open("en.ahmedraza", 'r') as f:
+    with open("en.ahmedraza", "r") as f:
         for line in f.readlines():
-            if line == '\n': continue
+            if line == "\n": continue
             if line[:3] == "#==": break
-            verse = line.split('|')
+            verse = line.split("|")
             assert len(verse) == 3
             if int(verse[0]) == s:
                 surah.append(process_verse(verse[2]))
@@ -45,15 +44,15 @@ def parse_quran_tafsir():
     verse = []
 
     def add_verse(verse, surah):
-        surah.append(' '.join(verse))
+        surah.append(" ".join(verse))
 
     def add_line(line, verse):
         """Add line and replace for Arabic ligatures (salawat)"""
-        verse.append(line.strip().replace("(s)", 'ﷺ‎'))
+        verse.append(line.strip().replace("(s)", "ﷺ‎"))
 
-    with open("Al_Jalalain_Eng.txt", 'r') as f:
+    with open("Al_Jalalain_Eng.txt", "r") as f:
         for line in f.readlines():
-            if line == '\n': continue
+            if line == "\n": continue
             if re.match("\d+\w*", line): continue
             elif line.startswith("[%d:%d]" % (s, v)):
                 in_verse = True
@@ -98,26 +97,26 @@ class Quran(object):
         elif data == "tafsir":
             self.text = parse_quran_tafsir()
 
-    def getSurah(self, surah):
+    def get_surah(self, surah):
         """Get surah by number."""
         return self.text[surah - 1]
 
-    def getAyah(self, surah, ayah):
+    def get_ayah(self, surah, ayah):
         """Get verse by surah and ayah numbers."""
         return self.text[surah - 1][ayah - 1] + " (%d:%d)" % (surah, ayah)
 
-    def getAyahs(self, surah, a, b):
+    def get_ayahs(self, surah, a, b):
         """Get range of Ayahs as tuple """
-        return ' '.join(self.text[surah - 1][a - 1:b]) + " (%d:%d-%d)" % (surah, a, b)
+        return " ".join(self.text[surah - 1][a - 1:b]) + " (%d:%d-%d)" % (surah, a, b)
 
     @staticmethod
-    def getRandomAyah():
+    def get_random_ayah():
         surah = randint(1, 114)
         ayah = randint(1, Quran.surah_lengths[surah])
         return surah, ayah
 
     @staticmethod
-    def getNextAyah(s, a):
+    def get_next_ayah(s, a):
         length = Quran.surah_lengths[s]
         if a == length:
             s = s + 1 if s < 114 else 1
@@ -127,7 +126,7 @@ class Quran(object):
         return s, a
 
     @staticmethod
-    def getPreviousAyah(s, a):
+    def get_previous_ayah(s, a):
         if a == 1:
             s = s - 1 if s > 1 else 114
             a = Quran.surah_lengths[s]
@@ -146,9 +145,9 @@ def make_index():
     chapters = [s.attrib["tname"] for s in suras]
     # padding...
     for i in range(9):
-        chapters[i] = ' ' + chapters[i] + ' ' * (14 - len(chapters[i]))
+        chapters[i] = " " + chapters[i] + " " * (14 - len(chapters[i]))
     for i in range(9, 58):
-        chapters[i] += ' ' * (14 - len(chapters[i]))
+        chapters[i] += " " * (14 - len(chapters[i]))
 
     index = []
     left = range(1, 58)
@@ -156,12 +155,12 @@ def make_index():
     for i, j in zip(left, right):
         index.append("/{} <code>{}</code>/{} {}"
                      .format(i, chapters[i - 1], j, chapters[j - 1]))
-    return '\n'.join(index)
+    return "\n".join(index)
 
 
 def save_json(quran):
     """Save Quran to a json file."""
     import json
 
-    with open("quran.json", 'w') as f:
+    with open("quran.json", "w") as f:
         json.dump(quran, f, ensure_ascii=False)

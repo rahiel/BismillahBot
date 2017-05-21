@@ -2,7 +2,7 @@
 
 بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ
 
-BismillahBot is a bot on Telegram to explore the Qur'an.
+BismillahBot is a bot on Telegram to explore the Holy Qur'an.
 
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
 **Table of Contents**
@@ -21,8 +21,9 @@ Use the bot by messaging [Bismillahbot][] on [Telegram][]. For every verse the
 bot has an English translation from [Imam Ahmad Raza][], audio recitation
 by [Shaykh Mahmoud Khalil al-Husary][], and exegesis (tafsir)
 from [Tafsir al-Jalalayn][]. The translation and tafsir are available anywhere
-on Telegram via [inline mode][], just start a text with `@BismillahBot`. A
-conversation looks like: ![example]
+on Telegram via [inline mode][], just start a text with `@BismillahBot` (for
+example, type `@BismillahBot 1:1` in any chat). A conversation looks like:
+![example]
 
 [BismillahBot]: https://telegram.me/BismillahBot
 [Telegram]: https://telegram.org/
