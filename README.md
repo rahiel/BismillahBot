@@ -60,14 +60,6 @@ TOKEN = "<your-token-here>"
 Disable group chats for the bot by sending the BotFather the `/setjoingroups`
 command and customize the bot further.
 
-The bot uses a Unix socket to communicate with Redis. Put the following in your
-`redis.conf`:
-
-```
-unixsocket /tmp/redis.sock
-unixsocketperm 766
-```
-
 ## Data files
 
 The bot serves Quranic data collected from several projects. These are necessary

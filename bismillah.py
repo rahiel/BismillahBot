@@ -30,7 +30,7 @@ from quran import Quran, make_index
 from secret import TOKEN
 
 
-r = StrictRedis(unix_socket_path="/tmp/redis.sock")
+r = StrictRedis()
 redis_namespace = ""
 update_id = None
 
