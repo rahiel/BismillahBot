@@ -202,7 +202,7 @@ def serve(bot, data):
             bot.answer_inline_query(inline_query_id=query_id, cache_time=cache_time, results=results)
             continue
 
-        if not update.message:  # weird Telegram update with only an update_id
+        if not update.message or not update.message.text:  # updates without text
             continue
 
         chat_id = update.message.chat_id
