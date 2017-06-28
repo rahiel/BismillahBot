@@ -1,12 +1,10 @@
 import re
-from random import randint
 import xml.etree.ElementTree as ET
+from random import randint
 
 
-def parse_quran_trans():
-    """Parse translation text files (with ayah numbers) from
-    http://tanzil.net/trans/.
-    """
+def parse_quran(filename):
+    """Parse Quran text files (with ayah numbers) from http://tanzil.net."""
     quran = []
     surah = []
     s = 1
@@ -16,10 +14,12 @@ def parse_quran_trans():
         return (verse.strip()
                 .replace("– peace and blessings be upon him", "ﷺ‎"))
 
-    with open("en.ahmedraza", "r") as f:
+    with open(filename, "r") as f:
         for line in f.readlines():
-            if line == "\n": continue
-            if line[:3] == "#==": break
+            if line == "\n":
+                continue
+            if line.startswith("#"):
+                break
             verse = line.split("|")
             assert len(verse) == 3
             if int(verse[0]) == s:
@@ -35,7 +35,7 @@ def parse_quran_trans():
 
 def parse_quran_tafsir():
     """Parse tafsir al-Jalalayn from http://www.altafsir.com/Al-Jalalayn.asp, after
-    that PDF was processed with ``pdftotext -nopgbrk Al_Jalalain_Eng.pdf``.
+    that PDF was processed with `pdftotext -nopgbrk Al_Jalalain_Eng.pdf`.
     """
     quran = []
     surah = []
@@ -92,8 +92,10 @@ class Quran(object):
     # [0] for normal numbering
 
     def __init__(self, data):
-        if data == "translation":
-            self.text = parse_quran_trans()
+        if data == "arabic":
+            self.text = parse_quran("quran-uthmani.txt")
+        elif data == "translation":
+            self.text = parse_quran("en.ahmedraza")
         elif data == "tafsir":
             self.text = parse_quran_tafsir()
 
