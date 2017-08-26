@@ -25,7 +25,7 @@ from telegram import InlineQueryResultArticle, InputTextMessageContent
 from telegram.constants import MAX_MESSAGE_LENGTH
 from telegram.error import NetworkError, TelegramError, Unauthorized
 
-from quran import Quran, make_index
+from bismillahbot import Quran, make_index
 from secret import TOKEN
 
 
