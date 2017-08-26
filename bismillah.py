@@ -1,23 +1,22 @@
-###############################################################################
-# BismillahBot -- Explore the Holy Qur'an on Telegram                         #
-# Copyright (C) 1436-1438 AH  Rahiel Kasim                                    #
-#                                                                             #
-# This program is free software: you can redistribute it and/or modify        #
-# it under the terms of the GNU Affero General Public License as published by #
-# the Free Software Foundation, either version 3 of the License, or           #
-# (at your option) any later version.                                         #
-#                                                                             #
-# This program is distributed in the hope that it will be useful,             #
-# but WITHOUT ANY WARRANTY; without even the implied warranty of              #
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the               #
-# GNU Affero General Public License for more details.                         #
-#                                                                             #
-# You should have received a copy of the GNU Affero General Public License    #
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.       #
-###############################################################################
+# BismillahBot -- Explore the Holy Qur'an on Telegram
+# Copyright (C) 1436-1438 AH  Rahiel Kasim
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import re
 import sys
 from time import sleep, time
+from typing import Tuple
 
 import telegram
 import ujson as json
@@ -35,34 +34,34 @@ redis_namespace = ""
 update_id = None
 
 
-def save_user(chat_id, state):
-    """State is a list: [surah:int, ayah:int, type:str]"""
+def save_user(chat_id: int, state: Tuple[int, int, str]):
+    """State is a tuple: (surah, ayah, type)"""
     r.set(redis_namespace + str(chat_id),
-          json.dumps(state), ex=31536000)  # keep state for a year
+          json.dumps(state), ex=60 * 60 * 24 * 31 * 6)  # keep state for half a year
 
 
-def get_user(chat_id):
+def get_user(chat_id: int):
     v = r.get(redis_namespace + str(chat_id))
     if v is not None:
         return json.loads(v)
 
 
-def save_file(filename, file_id):
+def save_file(filename: str, file_id: str):
     r.set(redis_namespace + "file:" + filename,
-          json.dumps(file_id), ex=8035200)  # keep for 3 months
+          json.dumps(file_id), ex=60 * 60 * 24 * 31 * 3)  # keep for 3 months
 
 
-def get_file(filename):
+def get_file(filename: str):
     f = r.get(redis_namespace + "file:" + filename)
     if f is not None:
         return json.loads(f)
 
 
-def get_audio_filename(s, a):
+def get_audio_filename(s: int, a: int) -> str:
     return "Husary/" + str(s).zfill(3) + str(a).zfill(3) + ".mp3"
 
 
-def get_image_filename(s, a):
+def get_image_filename(s: int, a: int) -> str:
     return "quran_images/" + str(s) + "_" + str(a) + ".png"
 
 
@@ -96,7 +95,7 @@ def send_file(bot, filename, quran_type, **kwargs):
         return upload_from_disk()
 
 
-def get_default_query_results(quran):
+def get_default_query_results(quran: Quran):
     results = []
     ayat = [
         (13, 28), (33, 56), (2, 62), (10, 31), (17, 36), (5, 32), (39, 9), (17, 44), (28, 88), (17, 84), (33, 6),
@@ -152,7 +151,7 @@ def main():
 def serve(bot, data):
     global update_id
 
-    def send_quran(s, a, quran_type, chat_id, reply_markup=None):
+    def send_quran(s: int, a: int, quran_type: str, chat_id: int, reply_markup=None):
         if quran_type in ("english", "tafsir"):
             text = data[quran_type].get_ayah(s, a)
             bot.send_message(chat_id=chat_id, text=text[:MAX_MESSAGE_LENGTH],
@@ -172,7 +171,7 @@ def serve(bot, data):
                       performer="Shaykh Mahmoud Khalil al-Husary",
                       title="Quran %d:%d" % (s, a),
                       reply_markup=reply_markup)
-        save_user(chat_id, [s, a, quran_type])
+        save_user(chat_id, (s, a, quran_type))
 
     for update in bot.get_updates(offset=update_id, timeout=10):
         update_id = update.update_id + 1
@@ -285,7 +284,7 @@ def serve(bot, data):
     sys.stdout.flush()
 
 
-def parse_ayah(message):
+def parse_ayah(message: str):
     match = re.match("/?(\d+)[ :\-;.,]*(\d*)", message)
     if match is not None:
         s = int(match.group(1))
