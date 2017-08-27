@@ -48,7 +48,7 @@ def get_user(chat_id: int):
 
 def save_file(filename: str, file_id: str):
     r.set(redis_namespace + "file:" + filename,
-          json.dumps(file_id), ex=60 * 60 * 24 * 31 * 3)  # keep for 3 months
+          json.dumps(file_id), ex=60 * 60 * 24 * 31 * 4)  # keep for 4 months
 
 
 def get_file(filename: str):
@@ -217,9 +217,6 @@ def serve(bot, data):
         if chat_id < 0:
             continue            # bot should not be in a group
 
-        # "special:quran_type"
-        special_state = quran_type.split(":")
-
         if message.startswith("/"):
             command = message[1:]
             if command in ("start", "help"):
@@ -236,29 +233,11 @@ def serve(bot, data):
                         "https://github.com/rahiel/BismillahBot.")
             elif command == "index":
                 text = data["index"]
-            elif command == "feedback":
-                text = ("Jazak Allahu khayran! Your feedback is highly "
-                        "appreciated and will help us improve our services. "
-                        "Your next message will be sent to the developers. "
-                        "Send /cancel to cancel.")
-                save_user(chat_id, (s, a, "feedback:" + quran_type))
-            elif command == "cancel":
-                text = ("Cancelled.")
-                if len(special_state) > 1:
-                    save_user(chat_id, (s, a, special_state[1]))
             else:
                 text = None  # "Invalid command"
+
             if text:
                 bot.send_message(chat_id=chat_id, text=text, parse_mode="HTML")
-                continue
-
-        if len(special_state) > 1:
-            if special_state[0] == "feedback":
-                with open("feedback.txt", "a") as f:
-                    f.write("%d: %s\n" % (chat_id, message))
-                text = "Feedback saved 😊"
-                bot.send_message(chat_id=chat_id, text=text)
-                save_user(chat_id, (s, a, special_state[1]))
                 continue
 
         if message in ("english", "tafsir", "audio", "arabic"):
