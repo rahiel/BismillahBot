@@ -168,7 +168,7 @@ class Quran:
 
 def make_index():
     """An index of the Surahs in the Quran, formatted to send over Telegram."""
-    chapters = Quran.surah_names
+    chapters = Quran.surah_names[:]
     # padding...
     for i in range(9):
         chapters[i] = " " + chapters[i] + " " * (14 - len(chapters[i]))
