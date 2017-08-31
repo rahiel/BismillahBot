@@ -223,7 +223,8 @@ def serve(bot, data):
                 text = ("Send me the numbers of a surah and ayah, for example:"
                         " <b>2:255</b>. Then I respond with that ayah from the Holy "
                         "Quran. Type /index to see all Surahs or try /random. "
-                        "I'm available in any chat on Telegram, just type: <b>@BismillahBot</b>")
+                        "I'm available in any chat on Telegram, just type: <b>@BismillahBot</b>\n\n"
+                        "For audio tracks of complete Surahs, talk to @AudioQuranBot.")
             elif command == "about":
                 text = ("The English translation is by Imam Ahmed Raza from "
                         "tanzil.net/trans/. The audio is a recitation by "

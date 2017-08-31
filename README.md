@@ -25,6 +25,8 @@ on Telegram via [inline mode][], just start a text with `@BismillahBot` (for
 example, type `@BismillahBot 1:1` in any chat). A conversation looks like:
 ![example]
 
+Also see [AudioQuranBot][], a bot that sends audio files of complete surahs.
+
 [BismillahBot]: https://telegram.me/BismillahBot
 [Telegram]: https://telegram.org/
 [Imam Ahmad Raza]: https://en.wikipedia.org/wiki/Ahmed_Raza_Khan_Barelvi
@@ -32,6 +34,7 @@ example, type `@BismillahBot 1:1` in any chat). A conversation looks like:
 [Tafsir al-Jalalayn]: http://www.altafsir.com/Al-Jalalayn.asp
 [inline mode]: https://telegram.org/blog/inline-bots
 [example]: https://i.imgur.com/kITXcHz.png "Example conversation"
+[AudioQuranBot]: https://github.com/rahiel/AudioQuranBot
 
 # Installation
 
